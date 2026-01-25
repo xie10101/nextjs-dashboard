@@ -31,6 +31,6 @@
     "app/lib/placeholder-data.ts",
     "scripts/seed.js",
     ".next/dev/types/**/*.ts"
-  ],
+, "app/dashboard/invoices", "app/dashboard/customers"  ],
   "exclude": ["node_modules"]
 }
