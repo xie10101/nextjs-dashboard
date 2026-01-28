@@ -1,29 +1,38 @@
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { lusitana } from '@/app/ui/fonts';
-// File: app/page.tsx
-import { neon } from '@neondatabase/serverless';
-
-export default function Page() {
-  async function create(formData: FormData) {
-    'use server';
-    // Connect to the Neon database
-    const sql = neon(`${process.env.DATABASE_URL}`);
-    const comment = formData.get('comment');
-    // Insert the comment from the form into the Postgres database
-    await sql`INSERT INTO comments (comment) VALUES (${comment})`;
-  }
-
+ import { fetchCardData, fetchRevenue, fetchLatestInvoices } from '@/app/lib/data';
+export default async function Page() {
+     const [
+    cardData,
+    revenue, 
+    latestInvoices
+  ] = await Promise.all([
+    fetchCardData(),
+    fetchRevenue(),
+    fetchLatestInvoices()
+  ]);
+  const { totalPaidInvoices, totalPendingInvoices, numberOfInvoices, numberOfCustomers } = cardData;
   return (
-    <>
-    <p className={`${lusitana.className} text-3xl text-gray-800`}>
-      Dashboard Page
-    </p>
-
-    <form action={create} className="flex flex-col items-center justify-center">
-      <input type="text" placeholder="write a comment" name="comment" />
-      <button type="submit">Submit</button>
-    </form>
-    </>
-
-    
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        仪表板
+      </h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="已收款" value={totalPaidInvoices} type="collected" />
+        <Card title="待处理" value={totalPendingInvoices} type="pending" />
+        <Card title="总发票数" value={numberOfInvoices} type="invoices" />
+        <Card
+          title="总客户数"
+          value={numberOfCustomers}
+          type="customers"
+        />
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        <RevenueChart revenue={revenue}  />
+        <LatestInvoices latestInvoices={latestInvoices} />
+      </div>
+    </main>
   );
 }
