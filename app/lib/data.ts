@@ -1,24 +1,25 @@
-import postgres from 'postgres';
-import {
-  CustomerField,
-  CustomersTableType,
-  InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw,
-  Revenue,
-} from './definitions';
+//   server层 - 数据获取层- / controller 
 import { formatCurrency } from './utils';
 import { db } from '../database/orm_database';
 import { customers, invoices, revenue } from '../database';
 import { desc, eq, count, sql } from 'drizzle-orm';
 //  现在进行改写 - 结合 orm 
+import { unstable_noStore as noStore } from 'next/cache';
+
+/**
+ *   unstable_noStore（通常别名为 noStore）
+ *   是 Next.js 提供的显式退出缓存的 API，用于强制组件或函数进行动态渲染（Dynamic Rendering），
+ *   确保每次请求都实时获取最新数据。
+ */
 export async function fetchRevenue() {
+  noStore(); 
   try {
+    //  模拟慢速获取 
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
 
     // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // 存在渲染延迟  -link 点击点不动的现象
 
     const data = await db.select().from(revenue).limit(10);
 
@@ -30,8 +31,8 @@ export async function fetchRevenue() {
     throw new Error('Failed to fetch revenue data.');
   }
 }
-
 export async function fetchLatestInvoices() {
+    noStore();
   try {
     const data = await db
       .select({
@@ -58,6 +59,7 @@ export async function fetchLatestInvoices() {
 }
 
 export async function fetchCardData() {
+   noStore(); 
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
