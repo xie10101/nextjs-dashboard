@@ -44,6 +44,7 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
   amount: number;
 };
 
+// 展示table列表条类型 
 export type InvoicesTable = {
   id: string;
   customer_id: string;
