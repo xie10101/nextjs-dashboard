@@ -21,6 +21,7 @@ async function seedUsers() {
 
   const insertedUsers = await Promise.all(
     users.map(async (user) => {
+      // 加密存储
       const hashedPassword = await bcryptjs.hash(user.password, 10);
       return sql`
         INSERT INTO users (id, name, email, password)

@@ -1,0 +1,11 @@
+# 基础忽略
+node_modules/
+.next/
+out/
+dist/
+
+# 其他忽略（根据项目调整）
+*.config.js
+*.config.ts
+public/
+coverage/
