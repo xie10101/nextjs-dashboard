@@ -26,13 +26,28 @@ const FormSchema = z.object({
 // 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 //然后可以基于它快速生成各种“精简版”  -- 业务和处理逻辑 - id 不填 - date 自动生成 -当前创建日期 
-export async function createInvoice(formData: FormData) {
-    const { customerId, amount, status } = CreateInvoice.parse({
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+export async function createInvoice( prevState: State, formData: FormData) {
+    const validationResult = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });  
   // Test it out:
+  if (!validationResult.success) {
+    return {
+      errors: validationResult.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Invoice.',
+    };
+  }
+  const { customerId, amount, status } = validationResult.data; // data获取数据 
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split('T')[0];
   try{
@@ -44,8 +59,10 @@ export async function createInvoice(formData: FormData) {
   });
   revalidatePath('/dashboard/invoices'); 
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to create invoice.');
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+    // 报错错误的处理可能不好直观显示和用户理解，所以这里返回一个 message 字段
   }
      redirect('/dashboard/invoices');
 }
