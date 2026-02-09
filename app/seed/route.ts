@@ -5,9 +5,10 @@ import { neon } from '@neondatabase/serverless';
 import { invoices, customers, revenue, users } from '../lib/placeholder-data.ts';
 console.log(process.env.DATABASE_URL)                         
 const sql = neon(`${process.env.DATABASE_URL}`); 
-//  可以使用原生 neno执行 sql操作 
+//  可以使用原生 neno执行 sql操作- 没有经过orm处理  
 
 
+// 
 async function seedUsers() {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
   await sql`

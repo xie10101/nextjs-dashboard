@@ -1,13 +1,11 @@
-import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text } from 'drizzle-orm/pg-core';
 
-//  
-export const customers = pgTable('customers', {
+export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  image_url: varchar('image_url', { length: 255 }),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
 });
 
-// 类型导出
-export type Customer = typeof customers.$inferSelect;
-export type NewCustomer = typeof customers.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
