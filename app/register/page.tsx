@@ -1,10 +1,7 @@
 
 import AcmeLogo from '@/app/ui/acme-logo';
-import LoginForm from '@/app/ui/login-form';
-import Link from 'next/link';
-
-export default function LoginPage() {
-
+ import RegisterForm from '@/app/ui/register-form';
+export default function RegisterPage() {
   return (
     <main className="flex items-center justify-center md:h-screen">
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
@@ -13,12 +10,8 @@ export default function LoginPage() {
             <AcmeLogo />
           </div>
         </div>
-        <LoginForm />
-              {/* 添加一个注册跳转链接  */}
-         <div className="text-center text-sm text-white">
-            还没有账号？ <Link href="/register" className="text-blue-300 hover:underline">去注册</Link>
-         </div>
+        <RegisterForm />
       </div>
-    </main>  
+    </main>
   );
 }

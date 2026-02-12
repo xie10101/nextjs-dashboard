@@ -6,6 +6,7 @@ import { lusitana } from '@/app/ui/fonts';
 import { Suspense } from 'react';
 import { RevenueChart } from '@/app/dashboard/revenue-chart';
 import { RevenueChartSkeleton, LatestInvoicesSkeleton } from "@/app/ui/skeletons"
+import Info from '@/app/ui/infos';
 export default async function Page() {
 const [
     cardData,
@@ -17,9 +18,13 @@ const [
   const { totalPaidInvoices, totalPendingInvoices, numberOfInvoices, numberOfCustomers } = cardData;
   return (
     <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        仪表板
-      </h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+          仪表板
+        </h1>
+        <Info />
+      </div>
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Card title="已收款" value={totalPaidInvoices} type="collected" />
         <Card title="待处理" value={totalPendingInvoices} type="pending" />

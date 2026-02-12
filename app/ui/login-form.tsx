@@ -7,10 +7,13 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { authenticate } from '@/app/lib/actions';
 export default function LoginForm() {
-    const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+    const [errorMessage, dispatch] = useActionState(authenticate, undefined);
+
+    // errorMessag== state -等于 action最后执行的返回值   
     
   return (
     <form className="space-y-3" action={dispatch}>

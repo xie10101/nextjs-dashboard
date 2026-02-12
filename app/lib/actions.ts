@@ -8,12 +8,20 @@ import { invoices } from '../database';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import bcrypt from 'bcryptjs';
+import {users} from '../database/users';
 //创建 数据结构 schema  
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(),
-  status: z.enum(['pending', 'paid']),
+  customerId: z.string({
+    invalid_type_error: 'Please select a customer.',
+  }),
+  amount: z.coerce
+    .number()
+    .gt(0, { message: 'Please enter an amount greater than $0.' }),
+  status: z.enum(['pending', 'paid'], {
+    invalid_type_error: 'Please select an invoice status.',
+  }),
   date: z.string(),
 });
 /**
@@ -35,12 +43,14 @@ export type State = {
   };
   message?: string | null;
 };
+//  没有的添加 
 export async function createInvoice( prevState: State, formData: FormData) {
     const validationResult = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
-  });  
+  });
+  console.log(validationResult)
   // Test it out:
   if (!validationResult.success) {
     return {
@@ -71,7 +81,7 @@ export async function createInvoice( prevState: State, formData: FormData) {
 
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
  
-// ...
+// ... 
  
 export async function updateInvoice(id: string, formData: FormData) {
   const { customerId, amount, status } = UpdateInvoice.parse({
@@ -128,4 +138,48 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+// 注册用户
+export async function registerUser(prevState: { message: string }|undefined, formData: FormData) {
+  console.log(formData)
+  const name = formData.get("username") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  
+  // 表单校验 - zod 做 
+  const RegisterSchema = z.object({
+    username: z.string().min(3, "用户名至少 3 个字符"),
+    email: z.string().email("请输入有效的邮箱"),
+    password: z.string().min(6, "密码至少 6 个字符"),
+  });
+
+  try {
+    RegisterSchema.parse({
+      username: name,
+      email: email,
+      password: password,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { message: error.errors.map((e) => e.message).join(", ") };
+    }
+    throw error;
+  }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    await db.insert(users).values({
+        name: name,
+        email: email,
+        password: hashedPassword,
+    });
+      await signIn('credentials', 
+        {
+          email: email,
+          password: password,
+          redirectTo: '/dashboard',
+        }
+      );
+  // 此处逻辑完整执行，但抛出错误的原因 ？ 
 }
