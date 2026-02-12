@@ -10,6 +10,7 @@ export default async function Info() {
       <p>用户ID: </p>
       <p>欢迎, {session.user.name}</p>
       <p>邮箱: {session.user.email}</p>
+      <p>用户ID: {session.user.id}</p>
       {/* 注意：默认情况下 session.user 可能不包含 id */}
     </div>
   );

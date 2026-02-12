@@ -3,14 +3,32 @@ import type { NextAuthConfig } from 'next-auth';
  
 export const authConfig = {
   pages: {
-    signIn: '/login', // 对应于 app/login/page.tsx (会自动生产一个默认登录页面)
-    // 指定自定义登录、退出登录和错误页面的路由
-    // 用户将被重定向到我们的自定义登录页面，而不是 NextAuth.js 默认页面。
+    signIn: '/login', 
+    //指定自定义登录、退出登录和错误页面的路由， 对应于 app/login/page.tsx (会自动生产一个默认登录页面)
   },
+session: {
+    strategy: "jwt", // 使用 JWT
+  },
+
     //   保护路由逻辑 
     callbacks: {
         // 验证通过 Next.js 中间件访问页面的请求是否被授权
-        
+    async jwt({ token, user }) {
+      if (user) {
+        // 把自定义字段加到 token 里
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    // 2️⃣ Session 回调：把 token 映射到 session 给前端使用
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  
         //这个函数会在 Next.js Middleware（中间件）中被调用 
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
